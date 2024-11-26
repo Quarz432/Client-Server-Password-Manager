@@ -1,11 +1,17 @@
 import socket
-#                             IPv4            TCP-Protokoll
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#                                                             IPv4                              TCP-Protokoll
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_ip = "127.0.0.1"
 port = 44444
 
-benutzername = input("Gebe den Nutzernamen ein: ")
-passwort = input("Gebe das Passwort ein: ")
+client_socket.connect((server_ip, port))
 
+benutzername = input("Bitte gebe einen Benutzernamen ein: ")
+passwort = input("Bitte gebe ein Passwort ein: ")
 
+daten_zum_übermitteln = f"{benutzername}:{passwort}"
 
+client_socket.send(daten_zum_übermitteln.encode())
+#Antwort entgegen
+response = client_socket.recv(1024)
+print(response.decode())
