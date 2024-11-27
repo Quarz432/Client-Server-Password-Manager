@@ -13,9 +13,7 @@ def init_db():
     ''')
 
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS passw
-                   
-                   ords (
+    CREATE TABLE IF NOT EXISTS passwords (
         id INTEGER PRIMARY KEY  AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         service TEXT NOT NULL,
