@@ -14,8 +14,7 @@ def init_db():
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS passwords (
-        id INTEGER PRIMARY KEY  AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
+        user_id INTEGER PRIMARY KEY,
         service TEXT NOT NULL,
         service_username TEXT,
         service_passwort TEXT,

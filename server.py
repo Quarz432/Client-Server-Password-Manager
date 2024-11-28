@@ -4,8 +4,6 @@ import sys
 import sqlite3
 
 
-
-
 class Server:
     def __init__(self):
         self.server_ip = "127.0.0.1"
@@ -15,7 +13,6 @@ class Server:
         self.server_socket.listen(7)
         print("[*] Server gestartet")
         self.lock = threading.Lock()
-
 
         try:
             self.conn = sqlite3.connect('C:\\Users\\Alico\\Documents\\GitHub\\Client-Server-Password-Manager\\passwort_manager.db', check_same_thread=False)
@@ -89,7 +86,7 @@ class Server:
             print(f"Der Account {accountname} wurde gelöscht.")
 
     def client_menue(self):
-
+        pass
 
     def client_handler(self):
         try:
@@ -116,26 +113,31 @@ class Server:
                         [4] Account bearbeitet
                         [0] Sitzung Beenden
                         '''.encode())
-
                         benutzer_menuauswahl = self.client_socket.recv(1024).decode()
+                        print(benutzer_menuauswahl)
                         if benutzer_menuauswahl == "1":
                             try:
                                 self.cursor.execute("SELECT u.username, p.service, p.service_username, p.service_passwort FROM users u JOIN passwords p on u.id = p.user_id WHERE u.username = ?", (username,))
                                 self.conn.commit()
+                                print("1")
                                 login_data = self.cursor.fetchall()
 
                                 resultat = ""  # Leerer Startstring
                                 separator = ":"  # Separator
+                                print("2")
 
                                 for index, element in enumerate(login_data):
                                     if index == 0:
-                                        resultat += element  # Erster Eintrag ohne Separator
+                                        resultat += separator.join(map(str, element))  # Ersten Eintrag formatieren
                                     else:
-                                        resultat += separator + element  # Separator hinzufügen
+                                        resultat += separator + separator.join(
+                                            map(str, element))  # Weitere Einträge anhängen
                                 print(resultat)
-
+                                print("3")
                                 with self.lock:
                                     self.client_socket.send(resultat.encode())
+                                    print("4")
+                                print("5")
 
                             except Exception as e:
                                 print("ERR","Database Error Dienste anzeigen und sendne fehlgeschlagen", e)
@@ -149,18 +151,13 @@ class Server:
                                     benutzername = self.client_socket.recv(1024).decode()
                                     self.client_socket.send("Bitte geben Sie das Passwort an: ".encode())
                                     passwort = self.client_socket.recv(1024).decode()
-                                    self.cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
-                                    id = self.cursor.fetchone()
-                                    self.cursor.execute("INSERT INTO passwords (id, service, service_username, service_passwort) VALUES (?,?,?)", (id[0], anbieter,benutzername,password))
+                                    self.cursor.execute("INSERT INTO passwords (service, service_username, service_passwort) VALUES (?,?,?)", (anbieter,benutzername,password))
                                     self.conn.commit()
                             except Exception as e:
                                 print("ERR","Connection Error", e)
                     else:
                         self.client_socket.send(b"Invalid Login")
                 except Exception as e:
-
-
-
                     print("ERR","Database Insertion Error", e)
             else:
                 self.client_socket.send(b"Invalid Format")
